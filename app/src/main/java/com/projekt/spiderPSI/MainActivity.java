@@ -1,18 +1,27 @@
 package com.projekt.spiderPSI;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -21,6 +30,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import static android.R.attr.data;
 
 public class MainActivity extends Activity {
 
@@ -31,16 +42,31 @@ public class MainActivity extends Activity {
     Uri outputFileUri;
     private static final String lang = "eng";
     String result = "empty";
-
     private static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/spider psi projekt/";
     private static final String TESSDATA = "tessdata";
+    private static int RESULT_LOAD_IMAGE = 100;
+    //AppCompatImageView imgView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button selectImg = (Button) findViewById(R.id.select_btn);
 
+      //  ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+        Button selectImg = (Button) findViewById(R.id.select_btn);
+        if(selectImg!=null)
+        {
+            selectImg.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                   startSelectImageActivity();
+                }
+            });
+        }
         Button captureImg = (Button) findViewById(R.id.action_btn);
         if (captureImg != null) {
             captureImg.setOnClickListener(new View.OnClickListener() {
@@ -54,17 +80,36 @@ public class MainActivity extends Activity {
         textView = (TextView) findViewById(R.id.textResult);
     }
 
+
+    public  boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v(TAG,"Permission is granted");
+                return true;
+            } else {
+
+                Log.v(TAG,"Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG,"Permission is granted");
+            return true;
+        }
+    }
+
+    private void startSelectImageActivity() {//wybieranie zdjecia
+        Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, RESULT_LOAD_IMAGE);
+        }
+
+
     /**
-    * select image from gallery (TO DO)
-    */
-
-
-
-
-    /**
-     * to get high resolution image from camera
+     * camera
      */
-    private void startCameraActivity() {
+    private void startCameraActivity() {//robienie zdjecia
         try {
             String IMGS_PATH = Environment.getExternalStorageDirectory().toString() + "/spider psi projekt/imgs";
             prepareDirectory(IMGS_PATH);
@@ -87,12 +132,25 @@ public class MainActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent data) {
-        //making photo
+
         if (requestCode == PHOTO_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             prepareTesseract();
             startOCR(outputFileUri);
-        } else {
-            Toast.makeText(this, "ERROR: Image was not obtained.", Toast.LENGTH_SHORT).show();
+        } else  if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            outputFileUri = Uri.parse(picturePath);
+            cursor.close();
+
+            prepareTesseract();
+            startOCR(outputFileUri);
+        }
+            else{
+           Toast.makeText(this, "ERROR: Nie uzyskano obrazu.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -155,11 +213,11 @@ public class MainActivity extends Activity {
                     in.close();
                     out.close();
 
-                    Log.d(TAG, "Copied " + fileName + "to tessdata");
+                    Log.d(TAG, "Skopiowano " + fileName + "do tessdata");
                 }
             }
         } catch (IOException e) {
-            Log.e(TAG, "Unable to copy files to tessdata " + e.toString());
+            Log.e(TAG, "Nie mozna skopiowac pliku do folderu tessdata " + e.toString());
         }
     }
 
@@ -192,7 +250,7 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
             if (tessBaseApi == null) {
-                Log.e(TAG, "TessBaseAPI is null. TessFactory not returning tess object.");
+                Log.e(TAG, "Nie utworzono obiektu API.");
             }
         }
 
@@ -205,13 +263,13 @@ public class MainActivity extends Activity {
     tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "!@#$%^&*()_+=qwertyuiop[]}{POIU" +
                "YTRWQasdASDfghFGHjklJKLl;L:'\"\\|~`xcvXCVbnmBNM,./<>?");
 
-        Log.d(TAG, "Training file loaded");
+        Log.d(TAG, "Załadowano plik uczący");
         tessBaseApi.setImage(bitmap);
-        String extractedText = "empty result";
+        String extractedText = "pusty Output";
         try {
             extractedText = tessBaseApi.getUTF8Text();
         } catch (Exception e) {
-            Log.e(TAG, "Error in recognizing text.");
+            Log.e(TAG, "Blad w rozpoznawaniu tekstu.");
         }
         tessBaseApi.end();
         return extractedText;
