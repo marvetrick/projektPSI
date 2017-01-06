@@ -15,13 +15,6 @@
         android:layout_below="@+id/instruction">
     </Button>
 
-    <TextView
-        android:id="@+id/textResult"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="OCR result will be here"
-        android:layout_below="@+id/action_btn"/>
-
     <Button
         android:text="SELECT IMAGE"
         android:layout_width="wrap_content"
@@ -43,15 +36,61 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+    <Button
+        android:text="LOAD CITIES"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/LoadCities"
+        android:layout_below="@+id/select_btn"
+        android:layout_alignLeft="@+id/select_btn"
+        android:layout_alignStart="@+id/select_btn"
+        android:layout_alignRight="@+id/select_btn"
+        android:layout_alignEnd="@+id/select_btn" />
+
     <ImageView
         app:srcCompat="@mipmap/ic_launcher"
         android:id="@+id/imgView"
-        android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:layout_width="wrap_content"
+        android:layout_below="@+id/LoadCities"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="126dp"
+        android:layout_toRightOf="@+id/textResult"
+        android:layout_toEndOf="@+id/textResult"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/select_btn"
-        android:layout_toStartOf="@+id/select_btn"
-        android:layout_marginBottom="153dp" />
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="false" />
+
+    <TextView
+        android:id="@+id/textResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OCR result will be here"
+        android:layout_above="@+id/cityView"
+        android:layout_alignRight="@+id/cityView"
+        android:layout_alignEnd="@+id/cityView" />
+
+    <TextView
+        android:text="Your city will appear here"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="61dp"
+        android:id="@+id/cityView"
+        android:layout_alignTop="@+id/imgView"
+        android:layout_alignRight="@+id/action_btn"
+        android:layout_alignEnd="@+id/action_btn" />
+
+    <TextView
+        android:text="Your recognised code will appear here:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="13dp"
+        android:id="@+id/const_TV1"
+        android:layout_above="@+id/textResult"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="14sp"
+        android:layout_alignRight="@+id/textResult"
+        android:layout_alignEnd="@+id/textResult" />
 </RelativeLayout>

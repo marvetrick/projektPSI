@@ -25,28 +25,38 @@ import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+import org.w3c.dom.Text;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import static android.R.attr.data;
 
 public class MainActivity extends Activity {
-
+//region VARIABLES
     private static final String TAG = MainActivity.class.getSimpleName();
     static final int PHOTO_REQUEST_CODE = 1;
     private TessBaseAPI tessBaseApi;
     TextView textView;
+    TextView cityView;
+    ImageView imageView;
     Uri outputFileUri;
     private static final String lang = "eng";
     String result = "empty";
     private static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/spider psi projekt/";
+    private static final String CITY_PATH = Environment.getExternalStorageDirectory().toString() + "/spider psi projekt/BazaKodyPocztoweMiast.txt";
     private static final String TESSDATA = "tessdata";
     private static int RESULT_LOAD_IMAGE = 100;
+    ArrayList<String> cityList = new ArrayList<String>();
     //AppCompatImageView imgView;
-
+//endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +66,17 @@ public class MainActivity extends Activity {
       //  ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
+        Button loadCities = (Button) findViewById(R.id.LoadCities) ;
+        if(loadCities!=null)
+        {
+            loadCities.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v)
+                {
+                    loadCityBase();
+                }
+            });
+        }
         Button selectImg = (Button) findViewById(R.id.select_btn);
         if(selectImg!=null)
         {
@@ -77,9 +98,58 @@ public class MainActivity extends Activity {
             });
         }
 
+      // printCity();
+        cityView = (TextView) findViewById(R.id.cityView);
         textView = (TextView) findViewById(R.id.textResult);
+        imageView = (ImageView) findViewById(R.id.imgView);
     }
 
+//region LOAD+COMPARE
+
+    /**
+     * loads cities code + name to arraylist from file @CITY_PATH
+     */
+    protected void loadCityBase(){
+       // Toast.makeText(this, "Click here",Toast.LENGTH_SHORT).show();
+
+        try {
+            FileInputStream instream = new FileInputStream(new File(CITY_PATH));
+
+            if (instream!=null) {
+
+                BufferedReader buffreader = new BufferedReader(new InputStreamReader(instream));
+
+                String line;
+                while( (line = buffreader.readLine()) != null) {
+                    cityList.add(line);
+
+
+            }}
+            instream.close();
+        } catch (java.io.FileNotFoundException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * compares string number value with every string in arraylist
+     */
+    protected void printCity(){
+        //String exampleCode = "32543";
+        String exampleCode = textView.getText().toString();
+        Toast.makeText(this, exampleCode, Toast.LENGTH_LONG).show();
+
+        for (String str : cityList){
+            if(str.contains(exampleCode)){
+   //
+                cityView.setText(str);
+            }
+        }
+        Toast.makeText(this, cityView.getText().toString(), Toast.LENGTH_LONG).show();
+    }
+//endregion
 
     public  boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -100,6 +170,10 @@ public class MainActivity extends Activity {
         }
     }
 
+    /**
+     *  select from gallery
+     */
+//region CAMERA+GALLERY
     private void startSelectImageActivity() {//wybieranie zdjecia
         Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, RESULT_LOAD_IMAGE);
@@ -109,7 +183,7 @@ public class MainActivity extends Activity {
     /**
      * camera
      */
-    private void startCameraActivity() {//robienie zdjecia
+    private void startCameraActivity() {
         try {
             String IMGS_PATH = Environment.getExternalStorageDirectory().toString() + "/spider psi projekt/imgs";
             prepareDirectory(IMGS_PATH);
@@ -128,15 +202,19 @@ public class MainActivity extends Activity {
             Log.e(TAG, e.getMessage());
         }
     }
+    /**
+    *   prepare and start OCR
+    */
 
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent data) {
 
-        if (requestCode == PHOTO_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == PHOTO_REQUEST_CODE && resultCode == Activity.RESULT_OK) {   /** when taking photo */
             prepareTesseract();
             startOCR(outputFileUri);
-        } else  if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            printCity();
+        } else  if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {  /** when selecting from gallery */
             Uri selectedImage = data.getData();
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
             Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
@@ -148,12 +226,13 @@ public class MainActivity extends Activity {
 
             prepareTesseract();
             startOCR(outputFileUri);
+            printCity();
         }
             else{
            Toast.makeText(this, "ERROR: Nie uzyskano obrazu.", Toast.LENGTH_SHORT).show();
         }
     }
-
+//endregion
     /**
      * Prepare directory on external storage
      *
@@ -172,7 +251,7 @@ public class MainActivity extends Activity {
         }
     }
 
-
+//region TESSERACT FUNCTIONS
     private void prepareTesseract() {
         try {
             prepareDirectory(DATA_PATH + TESSDATA);
@@ -257,11 +336,11 @@ public class MainActivity extends Activity {
         tessBaseApi.init(DATA_PATH, lang);
 
 //       //EXTRA SETTINGS
-      tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "1234567890-");
+        tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "1234567890");
 //
 //        //blackList Example
-    tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "!@#$%^&*()_+=qwertyuiop[]}{POIU" +
-               "YTRWQasdASDfghFGHjklJKLl;L:'\"\\|~`xcvXCVbnmBNM,./<>?");
+        tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_BLACKLIST, "-!@#$%^&*()_+=qwertyuiop[]}{POIU" +
+                "YTRWQasdASDfghFGHjklJKLl;L:'\"\\|~`xcvXCVbnmBNM,./<>?");
 
         Log.d(TAG, "Załadowano plik uczący");
         tessBaseApi.setImage(bitmap);
@@ -273,7 +352,9 @@ public class MainActivity extends Activity {
         }
         tessBaseApi.end();
         return extractedText;
+
     }
+    //endregion
 }
 
 
