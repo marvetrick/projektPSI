@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
     private TessBaseAPI tessBaseApi;
     TextView textView;
     TextView cityView;
-    ImageView imageView;
+   // ImageView imageView;
     Uri outputFileUri;
     private static final String lang = "eng";
     String result = "empty";
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
       // printCity();
         cityView = (TextView) findViewById(R.id.cityView);
         textView = (TextView) findViewById(R.id.textResult);
-        imageView = (ImageView) findViewById(R.id.imgView);
+      //  imageView = (ImageView) findViewById(R.id.imgView);
     }
 
 //region LOAD+COMPARE

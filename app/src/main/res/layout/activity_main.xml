@@ -8,11 +8,45 @@
     tools:context="com.projekt.spiderPSI.MainActivity">
 
     <Button
+        android:text="LOAD CITIES"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/LoadCities"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/action_btn"
+        android:layout_alignStart="@+id/action_btn" />
+
+    <TextView
+        android:text="Your recognised code will appear here:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/const_TV1"
+        android:textSize="14sp"
+        android:layout_below="@+id/textResult"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="49dp" />
+
+    <TextView
+        android:text="Your city will appear here"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:id="@+id/cityView"
+        android:layout_below="@+id/const_TV1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/action_btn"
         android:text="Capture image"
-        android:layout_below="@+id/instruction">
+        android:layout_below="@+id/LoadCities"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true">
     </Button>
 
     <Button
@@ -20,77 +54,65 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/select_btn"
-        android:layout_below="@+id/instruction"
-        android:layout_toRightOf="@+id/instruction"
-        android:layout_toEndOf="@+id/instruction"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp" />
-
-    <TextView
-        android:id="@+id/instruction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="jezyk - ANG, czarny ekran jest ok"
-        android:layout_marginTop="21dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:text="LOAD CITIES"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/LoadCities"
-        android:layout_below="@+id/select_btn"
-        android:layout_alignLeft="@+id/select_btn"
-        android:layout_alignStart="@+id/select_btn"
-        android:layout_alignRight="@+id/select_btn"
-        android:layout_alignEnd="@+id/select_btn" />
-
-    <ImageView
-        app:srcCompat="@mipmap/ic_launcher"
-        android:id="@+id/imgView"
-        android:cropToPadding="false"
-        android:layout_width="wrap_content"
-        android:layout_below="@+id/LoadCities"
+        android:layout_below="@+id/action_btn"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="126dp"
-        android:layout_toRightOf="@+id/textResult"
-        android:layout_toEndOf="@+id/textResult"
-        android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="false" />
+        android:layout_alignLeft="@+id/action_btn"
+        android:layout_alignStart="@+id/action_btn" />
 
     <TextView
         android:id="@+id/textResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="OCR result will be here"
-        android:layout_above="@+id/cityView"
-        android:layout_alignRight="@+id/cityView"
-        android:layout_alignEnd="@+id/cityView" />
-
-    <TextView
-        android:text="Your city will appear here"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="61dp"
-        android:id="@+id/cityView"
-        android:layout_alignTop="@+id/imgView"
-        android:layout_alignRight="@+id/action_btn"
-        android:layout_alignEnd="@+id/action_btn" />
-
-    <TextView
-        android:text="Your recognised code will appear here:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="13dp"
-        android:id="@+id/const_TV1"
-        android:layout_above="@+id/textResult"
+        android:layout_below="@+id/select_btn"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="14sp"
-        android:layout_alignRight="@+id/textResult"
-        android:layout_alignEnd="@+id/textResult" />
+        android:layout_marginTop="151dp" />
+
+    <TextView
+        android:text="3. Read city from below and enjoy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView4"
+        android:layout_alignBottom="@+id/select_btn"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="2. Make photo or select image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:layout_below="@+id/action_btn"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="1. Load city code database"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView2"
+        android:layout_alignBaseline="@+id/action_btn"
+        android:layout_alignBottom="@+id/action_btn"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/instruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OCR APP: "
+        android:layout_above="@+id/action_btn"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Made by Lukasz Pajak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/textView5"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>
